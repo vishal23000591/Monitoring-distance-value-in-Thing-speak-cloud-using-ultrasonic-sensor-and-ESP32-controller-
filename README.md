@@ -1,3 +1,5 @@
+# NAME: VISHAL S
+# REG. NO. : 212223110063
 # Monitoring-distance-value-in-Thing-speak-cloud-using-ultrasonic-sensor-and-ESP32-controller
 
 # Uploading ultrasonic sensor data in Thing Speak cloud
@@ -96,8 +98,66 @@ Prototype and build IoT systems without setting up servers or developing web sof
 
  
 # PROGRAM:
+```
+#include "ThingSpeak.h"
+#include <WiFi.h>
+
+char ssid[] = "Shree"; //SSID
+char pass[] = "1234"; // Password
+
+const int trigger = 25;
+const int echo = 26;
+long T;
+float distanceCM;
+WiFiClient  client;
+
+unsigned long myChannelField = 2729967; // Channel ID
+const int ChannelField = 1; // Which channel to write data
+const char * myWriteAPIKey = "LCE6H8XBC7O0366U"; // Your write API Key
+
+void setup()
+{
+  Serial.begin(115200);
+  pinMode(trigger, OUTPUT);
+  pinMode(echo, INPUT);
+  WiFi.mode(WIFI_STA);
+  ThingSpeak.begin(client);
+}
+void loop()
+{
+  if (WiFi.status() != WL_CONNECTED)
+  {
+    Serial.print("Attempting to connect to SSID: ");
+    Serial.println(ssid);
+    while (WiFi.status() != WL_CONNECTED)
+    {
+      WiFi.begin(ssid, pass);
+      Serial.print(".");
+      delay(5000);
+    }
+    Serial.println("\nConnected.");
+  }
+  digitalWrite(trigger, LOW);
+  delay(1);
+  digitalWrite(trigger, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigger, LOW);
+  T = pulseIn(echo, HIGH);
+  distanceCM = T * 0.034; //340 m/s or 0.034 cm/microsec
+  distanceCM = distanceCM / 2;
+  Serial.print("Distance in cm: ");
+  Serial.println(distanceCM);
+  ThingSpeak.writeField(myChannelField, ChannelField, distanceCM, myWriteAPIKey);
+  delay(1000);
+}
+```
 # CIRCUIT DIAGRAM:
+![image](https://github.com/user-attachments/assets/ced487f0-d64c-4cc4-ba4e-94f0dd761e3d)
+
 # OUTPUT:
+![image](https://github.com/user-attachments/assets/fd1abc7e-1c62-473e-8ada-a1897ee8e717)
+
+
 # RESULT:
 Thus the distance values are updated in the Thing speak cloud using ESP32 controller.
 
